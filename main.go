@@ -1,42 +1,42 @@
-// main.go
 package main
 
 import (
-	"atomblaster/audio"
-	"atomblaster/game"
+	"github.com/gen2brain/raylib-go/raylib"
 	"atomblaster/constants"
-	
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"atomblaster/game"
+	"math/rand"
+	"time"
 )
 
 func main() {
+	// Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+	
 	// Initialize window
-	rl.InitWindow(constants.ScreenWidth, constants.ScreenHeight, "Atom Blaster")
+	rl.SetConfigFlags(rl.FlagVsyncHint | rl.FlagMsaa4xHint)
+	rl.InitWindow(constants.ScreenWidth, constants.ScreenHeight, "Atomblaster 2.5D")
 	rl.SetTargetFPS(60)
 	
-	// Initialize audio
+	// Initialize audio device
 	rl.InitAudioDevice()
-	audioSystem := audio.NewAudioSystem()
 	
-	// Initialize game
-	gameState := game.NewGameState(audioSystem)
+	// Create game state
+	gameState := game.New()
 	
 	// Main game loop
 	for !rl.WindowShouldClose() {
-		// Get frame time
+		// Calculate delta time
 		dt := rl.GetFrameTime()
 		
-		// Update game
+		// Update game state
 		gameState.Update(dt)
 		
 		// Draw game
 		gameState.Draw()
-		
-		// Update audio system
-		audioSystem.Update()
 	}
 	
-	// Cleanup
+	// Clean up
+	gameState.Cleanup()
 	rl.CloseAudioDevice()
 	rl.CloseWindow()
 }
